@@ -9,6 +9,7 @@ def backward_acoustic_solver(
     dz,
     dt,
     shot_gather,
+    ix_receiver,
     iz_receiver,
     snapshot_steps,
     sigma,
@@ -34,7 +35,11 @@ def backward_acoustic_solver(
     u_prev = np.zeros((nz_ext, nx_ext))
     u_curr = np.zeros((nz_ext, nx_ext))
     u_next = np.zeros((nz_ext, nx_ext))
-    iz_src_ext = iz_receiver + n_abs
+
+    # Receiver position in extended model
+    ix_receiver_ext = ix_receiver + n_abs
+    iz_receiver_ext = iz_receiver + n_abs
+    n_receiver = len(ix_receiver_ext)
 
     # Snapshots only store ORIGINAL physical domain
     # Number of snapshots
@@ -84,7 +89,8 @@ def backward_acoustic_solver(
                                   +v*v*dt2*(d2u_dx2+d2u_dz2)) / (1.0+damp*dt)
                 
         # Source
-        u_next[iz_src_ext, n_abs:n_abs+nx] += shot_gather[nt-it-1,:]
+        for ir in range(n_receiver):
+            u_next[iz_receiver_ext[ir], ix_receiver_ext[ir]] += shot_gather[nt-it-1,ir]
 
         # Save snapshot, remove damping layers and store only original model
         if isnapshot < nsnapshot:

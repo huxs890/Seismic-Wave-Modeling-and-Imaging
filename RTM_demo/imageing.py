@@ -15,6 +15,8 @@ def RTM_imaging(
         wavelet,
         ix_src,   # ix_src = [x1,x2,x3,...]
         iz_src,   # depth of source
+        ix_receiver, # x-position of receivers
+        iz_receiver, # depth of receivers
         shotgather, # shotgather = [n_source,nt,nx]
         n_abs = 40,
 ):
@@ -62,7 +64,9 @@ def RTM_imaging(
             wavelet,
             coeff,
             ix_src[i],
-            iz_src,
+            iz_src[i],
+            ix_receiver[i],
+            iz_receiver[i],
             dx,
             dz,
             dt,
@@ -79,7 +83,8 @@ def RTM_imaging(
             dz,
             dt,
             shotgather[i],
-            iz_src,
+            ix_receiver[i],
+            iz_receiver[i],
             snapshot_steps,
             sigma,
             n_abs,
@@ -108,7 +113,7 @@ def RTM_imaging(
         # 2.Source-normalized image
         illumination += source_energy 
     # 2.Source-normalized image
-    eps = 1e-5 * np.max(illumination)
+    eps = 1e-5 * np.max(np.abs(illumination))
     image2 = image1 / (illumination + eps) # multi-shot stacking   
 
     return image1,image2 

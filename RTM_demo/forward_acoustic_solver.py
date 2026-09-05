@@ -8,6 +8,8 @@ def forward_acoustic_solver(
     coeff,
     ix_src,
     iz_src,
+    ix_receiver,
+    iz_receiver,
     dx,
     dz,
     dt,
@@ -34,6 +36,11 @@ def forward_acoustic_solver(
     ix_src_ext = ix_src + n_abs
     iz_src_ext = iz_src + n_abs
 
+    # Receiver position in extended model
+    ix_receiver_ext = ix_receiver + n_abs
+    iz_receiver_ext = iz_receiver + n_abs
+    n_receiver = len(ix_receiver_ext)
+
     # Wavefields defined on EXTENDED computational domai
     u_prev = np.zeros((nz_ext, nx_ext))
     u_curr = np.zeros((nz_ext, nx_ext))
@@ -47,7 +54,7 @@ def forward_acoustic_solver(
     isnapshot = 0
 
     # shotgather
-    shotgather = np.zeros((nt,nx))
+    shotgather = np.zeros((nt,n_receiver))
 
     # Time stepping
     for it in range(nt):
@@ -93,7 +100,8 @@ def forward_acoustic_solver(
         u_next[iz_src_ext, ix_src_ext] += wavelet[it]
 
         # Save shotgathers
-        shotgather[it,:] = u_next[iz_src_ext,n_abs:n_abs+nx]
+        for ir in range(n_receiver):
+            shotgather[it,ir] = u_next[iz_receiver_ext[ir], ix_receiver_ext[ir]]
 
         # Save snapshot, remove damping layers and store only original model
         if isnapshot < nsnapshot:
