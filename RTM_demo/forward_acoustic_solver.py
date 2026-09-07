@@ -57,7 +57,7 @@ def forward_acoustic_solver(
     shotgather = np.zeros((nt,n_receiver))
 
     # Time stepping
-    for it in range(nt):
+    for it in range(nt-1):
         # Progress
         if (it + 1) % 100 == 0 or it == nt - 1:
             print("Time step:",it + 1,"/",nt,"  Time:",(it + 1) * dt,"s")
@@ -97,11 +97,11 @@ def forward_acoustic_solver(
                                   +v*v*dt2*(d2u_dx2+d2u_dz2)) / (1.0+damp*dt)
                 
         # Source
-        u_next[iz_src_ext, ix_src_ext] += wavelet[it]
+        u_next[iz_src_ext, ix_src_ext] += velocity_ext[iz_src_ext, ix_src_ext]**2 * dt2 * wavelet[it]
 
         # Save shotgathers
         for ir in range(n_receiver):
-            shotgather[it,ir] = u_next[iz_receiver_ext[ir], ix_receiver_ext[ir]]
+            shotgather[it+1,ir] = u_next[iz_receiver_ext[ir], ix_receiver_ext[ir]]
 
         # Save snapshot, remove damping layers and store only original model
         if isnapshot < nsnapshot:

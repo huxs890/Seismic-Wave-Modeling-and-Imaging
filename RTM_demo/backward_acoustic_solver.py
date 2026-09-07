@@ -49,7 +49,7 @@ def backward_acoustic_solver(
     isnapshot = 0
 
     # Time stepping
-    for it in range(nt):
+    for it in range(nt-1):
         # Progress
         if (it + 1) % 100 == 0 or it == nt - 1:
             print("Time step:",it + 1,"/",nt,"  Time:",(it + 1) * dt,"s")
@@ -90,7 +90,9 @@ def backward_acoustic_solver(
                 
         # Source
         for ir in range(n_receiver):
-            u_next[iz_receiver_ext[ir], ix_receiver_ext[ir]] += shot_gather[nt-it-1,ir]
+            izr = iz_receiver_ext[ir]
+            ixr = ix_receiver_ext[ir]
+            u_next[izr, ixr] += velocity_ext[izr, ixr]**2 * dt2 * shot_gather[nt-it-1,ir]
 
         # Save snapshot, remove damping layers and store only original model
         if isnapshot < nsnapshot:
