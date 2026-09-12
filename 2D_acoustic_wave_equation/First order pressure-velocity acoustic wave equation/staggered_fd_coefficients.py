@@ -35,4 +35,4 @@ def staggered_fd_coefficients(order):
     # Solve for C1, C2, ..., CN
     coeff = np.linalg.solve(A, b)
 
-    return A,coeff
+    return coeff
